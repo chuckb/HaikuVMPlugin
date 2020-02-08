@@ -1,0 +1,17 @@
+plugins {
+  id 'java-gradle-plugin'
+}
+
+group = 'com.github.chuckb'
+version = '1.0'
+
+/*
+gradlePlugin {
+  plugins {
+    haikuvmPlugin {
+      id = 'com.github.chuckb.haikuvm-plugin'
+      implementationClass = 'com.chuckbenedict.gradle.plugin.HaikuVMPlugin'
+    }
+  }
+}
+*/

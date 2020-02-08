@@ -1,0 +1,2 @@
+rootProject.name='manualtest'
+includeBuild "../plugin"

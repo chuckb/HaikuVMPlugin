@@ -10,15 +10,19 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.plugins.ExtensionContainer;
+import org.gradle.api.tasks.Exec;
 import org.gradle.language.base.LanguageSourceSet;
 import org.gradle.language.c.CSourceSet;
 import org.gradle.language.c.plugins.CPlugin;
 import org.gradle.language.cpp.CppSourceSet;
 import org.gradle.language.cpp.plugins.CppPlugin;
+import org.gradle.model.ModelMap;
 import org.gradle.model.Mutate;
+import org.gradle.model.Path;
 import org.gradle.model.RuleSource;
 import org.gradle.nativeplatform.Flavor;
 import org.gradle.nativeplatform.FlavorContainer;
+import org.gradle.nativeplatform.NativeExecutableBinarySpec;
 import org.gradle.nativeplatform.NativeExecutableSpec;
 import org.gradle.nativeplatform.platform.NativePlatform;
 import org.gradle.nativeplatform.toolchain.Gcc;
@@ -178,6 +182,26 @@ public class BuildNative implements Plugin<Project> {
           });
           }
       });
+    }
+
+    @Mutate
+    public void createGetRawImageTask(ModelMap<Task> tasks, @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec) {
+      File elfFile = spec.getExecutable().getFile();
+      File imgFile;
+      if (elfFile.getName().endsWith(".elf")) {
+        imgFile = new File(elfFile.getParentFile(), elfFile.getName().replace(".elf", ".img"));
+      } else {
+        imgFile = new File(elfFile.getAbsolutePath() + ".img");
+      }  
+      tasks.create("getRawImage", Exec.class, new Action<Exec>() {
+        public void execute(Exec execTask) {
+          execTask.setDescription("Get raw binary image out of linker-generated elf container.");
+          execTask.getInputs().file(elfFile);
+          execTask.getOutputs().file(imgFile);
+          execTask.setWorkingDir(elfFile.getParentFile());
+          execTask.commandLine("arm-none-eabi-objcopy", elfFile.getName(), "-O", "binary", imgFile.getName());
+        }
+      });  
     }
   }  
 }

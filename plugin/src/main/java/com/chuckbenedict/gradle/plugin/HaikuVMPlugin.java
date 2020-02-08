@@ -74,21 +74,5 @@ public class HaikuVMPlugin implements Plugin<Project> {
     // Add the plugin to build native code for the Rpi
     project.getPlugins().apply("com.github.chuckb.buildpi");
 
-    // Shim up dependencies between haukilink and native build.
-    // Why do this here instead of on the model? Because we need the project to get the 
-    // tasks, which is not available in the model unless hoops are jumped through to 
-    // make it so. It is possible (see https://dzone.com/articles/gradle-goodness-getting-project-information-into-r).
-    // It is just easier to manipulate what the c and cpp plugins have
-    // done to the project afterward.
-    /*
-    project.getPluginManager().withPlugin("com.github.chuckb.buildpi", new Action<AppliedPlugin>() {
-      @Override
-      public void execute(AppliedPlugin appliedPlugin) {
-        project.getTasks().named("compileMainExecutableMainCpp", CppCompile.class,  cppCompile -> {
-          System.out.println("in here!!!");
-        });
-      }
-    });
-    */
   }
 }

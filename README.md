@@ -14,3 +14,4 @@ At this time, I have not bundled up the plugin and deployed to the Gradle repo. 
 1. Clone the project.
 2. Change directory to manualtest.
 3. `./gradlew mainExecutable`
+4. Marvel at the main.elf file built in ./build/exe/main

@@ -134,6 +134,7 @@ public class BuildNative implements Plugin<Project> {
                   args.add("-O0");
                   args.add("-nostartfiles");
                   args.add("-lstdc++");
+                  //TODO: Make reference to Haiku tools directory
                   args.add("-Wl,-T,/Users/chuck_benedict/Projects/PiHWBMSimple/rpi.x,--gc-sections,--relax,--defsym=__rtc_localtime=0");
                   args.add("-lm");
                   args.add("-march=armv6zk");
@@ -201,25 +202,29 @@ public class BuildNative implements Plugin<Project> {
       });  
     }
 
-    @Mutate void createShellDeployScriptTask(ModelMap<Task> tasks, @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec) {
+    @Mutate
+    void createShellDeployScriptTask(ModelMap<Task> tasks, @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec) {
       File elfFile = spec.getExecutable().getFile();
       File imgFile = getImageFile(elfFile);
-      File deployFile = new File(elfFile.getParentFile(), "deploy.sh");
+      File deployFile = getDeployScriptFile(elfFile);
       tasks.create("createShellDeployScript", ShellDeployScript.class, t -> {
+        t.setDescription("Create local Mac script to launch Rasbootin in a separate process.");
         t.script.set(deployFile);
         t.image.set(imgFile);
         t.dependsOn("getRawImage");
       });
     }
 
-/*    
     @Mutate
     public void createRasbootinDeployTask(ModelMap<Task> tasks, @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec) {
       File elfFile = spec.getExecutable().getFile();
-      File imgFile = getImageFile(elfFile);
-
+      File deployFile = getDeployScriptFile(elfFile);
+      tasks.create("deploy", Exec.class, t -> {
+        t.setDescription("Run raspberry pi com port boot loader to load raw image.");
+        t.dependsOn("createShellDeployScript");
+        t.commandLine("open", "-a", "Terminal", deployFile.getAbsolutePath());
+      });
     }
-*/
 
     private File getImageFile(File elfFile) {
       File imgFile;
@@ -229,6 +234,10 @@ public class BuildNative implements Plugin<Project> {
         imgFile = new File(elfFile.getAbsolutePath() + ".img");
       }  
       return imgFile;
+    }
+
+    private File getDeployScriptFile(File elfFile) {
+      return new File(elfFile.getParentFile(), "deploy.sh");
     }
   }  
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import com.chuckbenedict.gradle.plugin.extensions.NativeBuildExtension;
+import com.chuckbenedict.gradle.plugin.tasks.ShellDeployScript;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
@@ -187,21 +188,47 @@ public class BuildNative implements Plugin<Project> {
     @Mutate
     public void createGetRawImageTask(ModelMap<Task> tasks, @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec) {
       File elfFile = spec.getExecutable().getFile();
+      File imgFile = getImageFile(elfFile);
+      tasks.create("getRawImage", Exec.class, new Action<Exec>() {
+        public void execute(Exec execTask) {
+          execTask.setDescription("Get raw binary image out of linker-generated elf container.");
+          execTask.dependsOn("mainExecutable");
+          execTask.getInputs().files(elfFile);
+          execTask.getOutputs().files(imgFile);
+          execTask.setWorkingDir(elfFile.getParentFile());
+          execTask.commandLine("arm-none-eabi-objcopy", elfFile.getName(), "-O", "binary", imgFile.getName());
+        }
+      });  
+    }
+
+    @Mutate void createShellDeployScriptTask(ModelMap<Task> tasks, @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec) {
+      File elfFile = spec.getExecutable().getFile();
+      File imgFile = getImageFile(elfFile);
+      File deployFile = new File(elfFile.getParentFile(), "deploy.sh");
+      tasks.create("createShellDeployScript", ShellDeployScript.class, t -> {
+        t.script.set(deployFile);
+        t.image.set(imgFile);
+        t.dependsOn("getRawImage");
+      });
+    }
+
+/*    
+    @Mutate
+    public void createRasbootinDeployTask(ModelMap<Task> tasks, @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec) {
+      File elfFile = spec.getExecutable().getFile();
+      File imgFile = getImageFile(elfFile);
+
+    }
+*/
+
+    private File getImageFile(File elfFile) {
       File imgFile;
       if (elfFile.getName().endsWith(".elf")) {
         imgFile = new File(elfFile.getParentFile(), elfFile.getName().replace(".elf", ".img"));
       } else {
         imgFile = new File(elfFile.getAbsolutePath() + ".img");
       }  
-      tasks.create("getRawImage", Exec.class, new Action<Exec>() {
-        public void execute(Exec execTask) {
-          execTask.setDescription("Get raw binary image out of linker-generated elf container.");
-          execTask.getInputs().file(elfFile);
-          execTask.getOutputs().file(imgFile);
-          execTask.setWorkingDir(elfFile.getParentFile());
-          execTask.commandLine("arm-none-eabi-objcopy", elfFile.getName(), "-O", "binary", imgFile.getName());
-        }
-      });  
+      return imgFile;
     }
   }  
 }

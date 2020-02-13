@@ -1,1 +1,6 @@
 rootProject.name = 'haikuvm-plugin'
+sourceControl {
+  gitRepository("https://github.com/chuckb/raspbootin") {
+    producesModule("com.github.chuckb.raspbootin:raspbootcom")
+  }
+}

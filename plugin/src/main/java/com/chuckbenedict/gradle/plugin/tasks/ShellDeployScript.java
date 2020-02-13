@@ -22,12 +22,16 @@ public class ShellDeployScript extends DefaultTask {
   @InputFile
   public final RegularFileProperty image;
 
+  @InputFile
+  public final RegularFileProperty bootLoader;
+
   // Inject an ObjectFactory into the constructor
   @Inject
   public ShellDeployScript(ObjectFactory objectFactory) {
     this.objectFactory = objectFactory;
     script = objectFactory.fileProperty();
     image = objectFactory.fileProperty();
+    bootLoader = objectFactory.fileProperty();
     this.setDescription("Create a shell script that will launch an external process to run Rasbootin.");
   }
 
@@ -39,9 +43,7 @@ public class ShellDeployScript extends DefaultTask {
     file.setExecutable(true, true);
     PrintWriter writer = new PrintWriter(file);
     writer.println("#!/bin/bash");
-    // TODO: Make configurable
-    // TODO: Add installable dependency for rasbootcom
-    writer.println("'/Users/chuck_benedict/Projects/raspbootin/raspbootcom/raspbootcom' '/dev/tty.SLAB_USBtoUART' '" + image.getAsFile().get().getAbsolutePath() + "'");
+    writer.println("'" + bootLoader.getAsFile().get().getAbsolutePath() + "' '/dev/tty.SLAB_USBtoUART' '" + image.getAsFile().get().getAbsolutePath() + "'");
     writer.close();
   }  
 }

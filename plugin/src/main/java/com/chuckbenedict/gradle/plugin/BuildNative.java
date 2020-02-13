@@ -10,6 +10,7 @@ import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.ExternalDependency;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.tasks.Exec;
 import org.gradle.language.base.LanguageSourceSet;
@@ -46,6 +47,18 @@ public class BuildNative implements Plugin<Project> {
     // Apply the c and cpp plugins to the project
     project.getPlugins().apply(CppPlugin.class);
     project.getPlugins().apply(CPlugin.class);
+    //TODO: Don't assume this is created already...in fact, it should be created here.
+    final NativeBuildExtension nativeBuildExtension = project.getExtensions().getByType(NativeBuildExtension.class);
+
+    project.getConfigurations().create("deployment", deployment -> {
+      ExternalDependency raspbootcom = (ExternalDependency)project.getDependencies().create("com.github.chuckb.raspbootin:raspbootcom");
+      raspbootcom.setTargetConfiguration("executable");
+      raspbootcom.version(v -> {
+        v.setBranch("master");
+      });
+      deployment.getDependencies().add(raspbootcom);
+      nativeBuildExtension.setDeploymentConfiguration(deployment);
+    });
   }
 
   public static class Rpi extends RuleSource {
@@ -203,7 +216,10 @@ public class BuildNative implements Plugin<Project> {
     }
 
     @Mutate
-    void createShellDeployScriptTask(ModelMap<Task> tasks, @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec) {
+    void createShellDeployScriptTask(ModelMap<Task> tasks, 
+        @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec,
+        final ExtensionContainer extensionContainer) {
+      final NativeBuildExtension nativeBuildExtension = extensionContainer.getByType(NativeBuildExtension.class);
       File elfFile = spec.getExecutable().getFile();
       File imgFile = getImageFile(elfFile);
       File deployFile = getDeployScriptFile(elfFile);
@@ -211,17 +227,21 @@ public class BuildNative implements Plugin<Project> {
         t.setDescription("Create local Mac script to launch Rasbootin in a separate process.");
         t.script.set(deployFile);
         t.image.set(imgFile);
+        t.bootLoader.set(nativeBuildExtension.getDeploymentConfiguration().getSingleFile());
         t.dependsOn("getRawImage");
       });
     }
 
     @Mutate
-    public void createRasbootinDeployTask(ModelMap<Task> tasks, @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec) {
+    public void createRasbootinDeployTask(ModelMap<Task> tasks, 
+        @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec,
+        final ExtensionContainer extensionContainer) {
       File elfFile = spec.getExecutable().getFile();
       File deployFile = getDeployScriptFile(elfFile);
       tasks.create("deploy", Exec.class, t -> {
         t.setDescription("Run raspberry pi com port boot loader to load raw image.");
         t.dependsOn("createShellDeployScript");
+        t.dependsOn(extensionContainer.getByType(NativeBuildExtension.class).getDeploymentConfiguration());
         t.commandLine("open", "-a", "Terminal", deployFile.getAbsolutePath());
       });
     }

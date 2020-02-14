@@ -228,6 +228,7 @@ public class BuildNative implements Plugin<Project> {
         t.script.set(deployFile);
         t.image.set(imgFile);
         t.bootLoader.set(nativeBuildExtension.getDeploymentConfiguration().getSingleFile());
+        t.port.set(nativeBuildExtension.getPort());
         t.dependsOn("getRawImage");
       });
     }
@@ -242,6 +243,7 @@ public class BuildNative implements Plugin<Project> {
         t.setDescription("Run raspberry pi com port boot loader to load raw image.");
         t.dependsOn("createShellDeployScript");
         t.dependsOn(extensionContainer.getByType(NativeBuildExtension.class).getDeploymentConfiguration());
+        //TODO: Make OS independent
         t.commandLine("open", "-a", "Terminal", deployFile.getAbsolutePath());
       });
     }

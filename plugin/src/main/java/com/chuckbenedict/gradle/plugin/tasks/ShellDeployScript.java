@@ -9,6 +9,8 @@ import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -25,13 +27,16 @@ public class ShellDeployScript extends DefaultTask {
   @InputFile
   public final RegularFileProperty bootLoader;
 
-  // Inject an ObjectFactory into the constructor
+  @Input
+  public final Property<String> port;
+
   @Inject
   public ShellDeployScript(ObjectFactory objectFactory) {
     this.objectFactory = objectFactory;
     script = objectFactory.fileProperty();
     image = objectFactory.fileProperty();
     bootLoader = objectFactory.fileProperty();
+    port = objectFactory.property(String.class);
     this.setDescription("Create a shell script that will launch an external process to run Rasbootin.");
   }
 
@@ -43,7 +48,8 @@ public class ShellDeployScript extends DefaultTask {
     file.setExecutable(true, true);
     PrintWriter writer = new PrintWriter(file);
     writer.println("#!/bin/bash");
-    writer.println("'" + bootLoader.getAsFile().get().getAbsolutePath() + "' '/dev/tty.SLAB_USBtoUART' '" + image.getAsFile().get().getAbsolutePath() + "'");
+    //TODO: Parameterize port setting
+    writer.println("'" + bootLoader.getAsFile().get().getAbsolutePath() + "' '" + port.get() + "' '" + image.getAsFile().get().getAbsolutePath() + "'");
     writer.close();
   }  
 }

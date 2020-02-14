@@ -10,4 +10,5 @@ haikuvm {
   haikuVMDir = "/Users/chuck_benedict/Projects/haikuVM"  
   mainClass = "Main.java"
   haikuVMConfig = "rpi0"
+  port = "/dev/tty.SLAB_USBtoUART"
 }

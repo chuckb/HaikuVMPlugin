@@ -11,11 +11,13 @@ public class HaikuVMExtension {
   private final Property<String> haikuVMDir;
   private final Property<String> mainClass;
   private final Property<String> haikuVMConfig;
+  private final Property<String> port;
 
   public HaikuVMExtension(Project project) {
     this.haikuVMDir = project.getObjects().property(String.class);
     this.mainClass = project.getObjects().property(String.class);
     this.haikuVMConfig = project.getObjects().property(String.class);
+    this.port = project.getObjects().property(String.class);
   }
 
   public Property<String> getHaikuVMDirProvider() {
@@ -30,6 +32,10 @@ public class HaikuVMExtension {
     return haikuVMConfig;
   }
 
+  public Property<String> getPortProvider() {
+    return port;
+  }
+
   public String getHaikuVMDir() {
     return haikuVMDir.get(); 
   }
@@ -42,6 +48,10 @@ public class HaikuVMExtension {
     return haikuVMConfig.get();
   }
 
+  public String getPort() {
+    return port.get();
+  }
+
   public void setHaikuVMDir(String haikuVMDir) {
     this.haikuVMDir.set(haikuVMDir);
   }
@@ -52,5 +62,9 @@ public class HaikuVMExtension {
 
   public void setHaikuVMConfig(String haikuVMConfig) {
     this.haikuVMConfig.set(haikuVMConfig);
+  }
+
+  public void setPort(String port) {
+    this.port.set(port);
   }
 }

@@ -4,12 +4,13 @@ import java.net.URI;
 
 import com.chuckbenedict.gradle.plugin.extensions.HaikuVMExtension;
 import com.chuckbenedict.gradle.plugin.extensions.NativeBuildExtension;
+import com.chuckbenedict.gradle.plugin.internal.GradleUtil;
 import com.chuckbenedict.gradle.plugin.tasks.Haikulink;
-import com.chuckbenedict.gradle.plugin.tasks.UnzipHaikuVM;
 
 import org.gradle.api.*;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.tasks.Copy;
 
 public class HaikuVMPlugin implements Plugin<Project> {
   @Override
@@ -33,24 +34,25 @@ public class HaikuVMPlugin implements Plugin<Project> {
 
     // Add the haikutools dependency.
     // TODO: Make the version configurable
-    haikuToolsConfig.getDependencies().add(project.getDependencies().create("com.github.chuckb:haikuVM:-SNAPSHOT"));
+    haikuToolsConfig.getDependencies().add(project.getDependencies().create("com.github.chuckb:haikuVM:master-SNAPSHOT"));
 
     // Get the compile configuration
     final Configuration compileConfig = project.getConfigurations().getByName("compile");
     // Add the haikuVM Java build dependencies
     // TODO: Make the version configurable
-    compileConfig.getDependencies().add(project.getDependencies().create("com.github.chuckb.haikuVM:haikuRT:-SNAPSHOT"));
-    compileConfig.getDependencies().add(project.getDependencies().create("com.github.chuckb.haikuVM:bootstrap:-SNAPSHOT"));
+    compileConfig.getDependencies().add(project.getDependencies().create("com.github.chuckb.haikuVM:haikuRT:master-SNAPSHOT"));
+    compileConfig.getDependencies().add(project.getDependencies().create("com.github.chuckb.haikuVM:bootstrap:master-SNAPSHOT"));
 
     // Create the unzip task to unbundle HaikuVM
-    // TODO: Factor out constants
-    Task unzipHaikuVM = project.getTasks().create("unzipHaikuVM", UnzipHaikuVM.class, new Action<UnzipHaikuVM>() {
-      public void execute(UnzipHaikuVM unzipHaikuVMTask) {
-        unzipHaikuVMTask.setConfiguration("haikutools");
-        // Set the extension properties on the task from the extension
-        unzipHaikuVMTask.setHaikuVMDir(haikuVMExtension.getHaikuVMDirProvider());
+    Task unzipHaikuVM = project.getTasks().create("unzipHaikuVM", Copy.class, new Action<Copy>() {
+      public void execute(Copy t) {
+        t.from(project.zipTree(GradleUtil.getJar(project, "haikutools", "build")), spec -> {
+          spec.include("**/*");
+        });
+        t.into(haikuVMExtension.getHaikuVMDirProvider());
       }
     });
+
     // Add the task to the project
     project.getTasks().add(unzipHaikuVM);
     // Set the Java task compileJava up with a dependency on the unzip HaikuVM task

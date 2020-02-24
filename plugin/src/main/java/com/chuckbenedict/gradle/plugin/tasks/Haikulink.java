@@ -7,6 +7,7 @@ import java.util.List;
 import com.chuckbenedict.gradle.plugin.internal.GradleUtil;
 
 import org.gradle.api.file.ConfigurableFileTree;
+import org.gradle.api.file.Directory;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
@@ -23,13 +24,13 @@ import org.gradle.api.tasks.SourceSetContainer;
  * See http://haiku-vm.sourceforge.net/
  */
 public class Haikulink extends JavaExec {
-  private final Property<String> haikuVMDir;
+  private final Property<Directory> haikuVMDir;
   private final Property<String> mainClass;
   private final Property<String> haikuVMConfig;
 
   public Haikulink() {
     // Initialize member variables
-    haikuVMDir = getProject().getObjects().property(String.class);
+    haikuVMDir = getProject().getObjects().property(Directory.class);
     mainClass = getProject().getObjects().property(String.class);
     haikuVMConfig = getProject().getObjects().property(String.class);
 
@@ -45,7 +46,7 @@ public class Haikulink extends JavaExec {
    * for any given HaikuVM project.
    * @return  The directory string as a Gradle property.
    */
-  public Property<String> getHaikuVMDirProvider() {
+  public Property<Directory> getHaikuVMDirProvider() {
     return haikuVMDir;
   }
 
@@ -70,9 +71,13 @@ public class Haikulink extends JavaExec {
     return haikuVMConfig;
   }
 
-  @Input
-  public String getHaikuVMDir() {
+  public Directory getHaikuVMDir() {
     return haikuVMDir.get(); 
+  }
+
+  @Input
+  public String getHaikuVMDirAsString() {
+    return haikuVMDir.get().toString();
   }
 
   @Input
@@ -85,7 +90,7 @@ public class Haikulink extends JavaExec {
     return haikuVMConfig.get();
   }
 
-  public void setHaikuVMDir(String haikuVMDir) {
+  public void setHaikuVMDir(Directory haikuVMDir) {
     this.haikuVMDir.set(haikuVMDir);
   }
 
@@ -97,7 +102,7 @@ public class Haikulink extends JavaExec {
     this.haikuVMConfig.set(haikuVMConfig);
   }
 
-  public void setHaikuVMDir(Property<String> haikuVMDir) {
+  public void setHaikuVMDir(Property<Directory> haikuVMDir) {
     this.haikuVMDir.set(haikuVMDir);
   }
 

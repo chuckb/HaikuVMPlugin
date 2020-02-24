@@ -80,7 +80,9 @@ public class BuildNative implements Plugin<Project> {
     }
   
     @Mutate
-    void configureToolChains(NativeToolChainRegistry toolChains) {
+    void configureToolChains(NativeToolChainRegistry toolChains, final ExtensionContainer extensionContainer) {
+      final NativeBuildExtension nativeBuildExtension = extensionContainer.getByType(NativeBuildExtension.class);
+      File projectDir = nativeBuildExtension.getProjectDir();
       toolChains.create("gcc", Gcc.class, new Action<Gcc>() {
         public void execute(Gcc gcc) {
           // Set the executable names for gcc cross compiler
@@ -100,7 +102,7 @@ public class BuildNative implements Plugin<Project> {
               toolChain.getcCompiler().withArguments(new Action<List<String>>() {
                 public void execute(List<String> args) {
                   args.add("-DRPI0");
-                  args.add("-D__arm1176jzf-s__");
+//                  args.add("-D__arm1176jzf-s__");
                   args.add("-c");
                   args.add("-O0");
                   args.add("-fno-builtin");
@@ -120,7 +122,7 @@ public class BuildNative implements Plugin<Project> {
               toolChain.getCppCompiler().withArguments(new Action<List<String>>() {
                 public void execute(List<String> args) {
                   args.add("-DRPI0");
-                  args.add("-D__arm1176jzf-s__");
+//                  args.add("-D__arm1176jzf-s__");
                   args.add("-c");
                   args.add("-O0");
                   args.add("-fno-builtin");
@@ -147,8 +149,7 @@ public class BuildNative implements Plugin<Project> {
                   args.add("-O0");
                   args.add("-nostartfiles");
                   args.add("-lstdc++");
-                  //TODO: Make reference to Haiku tools directory
-                  args.add("-Wl,-T,/Users/chuck_benedict/Projects/PiHWBMSimple/rpi.x,--gc-sections,--relax,--defsym=__rtc_localtime=0");
+                  args.add("-Wl,-T," + projectDir.getAbsolutePath() + "/build/HaikuVM/src/lib/ldscripts/rpi.x" + ",--gc-sections,--relax,--defsym=__rtc_localtime=0");
                   args.add("-lm");
                   args.add("-march=armv6zk");
                   args.add("-mtune=arm1176jzf-s");
@@ -177,6 +178,7 @@ public class BuildNative implements Plugin<Project> {
             public void execute(LanguageSourceSet languageSourceSet) {
               CppSourceSet sourceSet = (CppSourceSet)languageSourceSet;
               sourceSet.builtBy(haikulinkTask);
+              //TODO: Make into constant
               sourceSet.getSource().srcDir(projectDir.getAbsolutePath() + "/build/HaikuVM/src");
               sourceSet.getSource().include("**/*.cpp");
               sourceSet.getExportedHeaders().srcDirs(

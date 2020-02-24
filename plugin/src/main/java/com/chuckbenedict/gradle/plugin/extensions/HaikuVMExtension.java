@@ -1,6 +1,7 @@
 package com.chuckbenedict.gradle.plugin.extensions;
 
 import org.gradle.api.Project;
+import org.gradle.api.file.Directory;
 import org.gradle.api.provider.Property;
 
 /**
@@ -8,19 +9,21 @@ import org.gradle.api.provider.Property;
  * for a HaikuVM project.
  */
 public class HaikuVMExtension {
-  private final Property<String> haikuVMDir;
+  private final Property<Directory> haikuVMDir;
   private final Property<String> mainClass;
   private final Property<String> haikuVMConfig;
   private final Property<String> port;
 
   public HaikuVMExtension(Project project) {
-    this.haikuVMDir = project.getObjects().property(String.class);
+    this.haikuVMDir = project.getObjects().property(Directory.class);
+    this.haikuVMDir.convention(project.getLayout().getBuildDirectory().dir("haikuVMSDK"));
     this.mainClass = project.getObjects().property(String.class);
+    this.mainClass.convention("Main.java");
     this.haikuVMConfig = project.getObjects().property(String.class);
     this.port = project.getObjects().property(String.class);
   }
 
-  public Property<String> getHaikuVMDirProvider() {
+  public Property<Directory> getHaikuVMDirProvider() {
       return haikuVMDir;
   }
 
@@ -36,7 +39,7 @@ public class HaikuVMExtension {
     return port;
   }
 
-  public String getHaikuVMDir() {
+  public Directory getHaikuVMDir() {
     return haikuVMDir.get(); 
   }
 
@@ -52,7 +55,7 @@ public class HaikuVMExtension {
     return port.get();
   }
 
-  public void setHaikuVMDir(String haikuVMDir) {
+  public void setHaikuVMDir(Directory haikuVMDir) {
     this.haikuVMDir.set(haikuVMDir);
   }
 

@@ -37,7 +37,7 @@ import org.gradle.platform.base.PlatformContainer;
 /**
  * Configure the c and cpp plugins to build the native application.
  * Certain project values are needed, which are not provided via the
- * model infrastructure. They have been provided via a custome extension.
+ * model infrastructure. They have been provided via a custom extension.
  * See https://mrhaki.blogspot.com/search/label/Gradle%3AGoodness for the
  * technique.
  */
@@ -53,6 +53,7 @@ public class BuildNative implements Plugin<Project> {
     project.getConfigurations().create("deployment", deployment -> {
       ExternalDependency raspbootcom = (ExternalDependency)project.getDependencies().create("com.github.chuckb.raspbootin:raspbootcom");
       raspbootcom.setTargetConfiguration("executable");
+      //TODO: Make configurable
       raspbootcom.version(v -> {
         v.setBranch("master");
       });
@@ -225,6 +226,7 @@ public class BuildNative implements Plugin<Project> {
       File elfFile = spec.getExecutable().getFile();
       File imgFile = getImageFile(elfFile);
       File deployFile = getDeployScriptFile(elfFile);
+      // TODO: Make OS aware
       tasks.create("createShellDeployScript", ShellDeployScript.class, t -> {
         t.setDescription("Create local Mac script to launch Rasbootin in a separate process.");
         t.script.set(deployFile);

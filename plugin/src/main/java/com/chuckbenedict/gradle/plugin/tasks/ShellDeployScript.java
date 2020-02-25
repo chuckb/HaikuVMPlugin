@@ -48,7 +48,6 @@ public class ShellDeployScript extends DefaultTask {
     file.setExecutable(true, true);
     PrintWriter writer = new PrintWriter(file);
     writer.println("#!/bin/bash");
-    //TODO: Parameterize port setting
     writer.println("'" + bootLoader.getAsFile().get().getAbsolutePath() + "' '" + port.get() + "' '" + image.getAsFile().get().getAbsolutePath() + "'");
     writer.close();
   }  

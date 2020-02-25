@@ -1,0 +1,2 @@
+rootProject.name='millisblink'
+includeBuild "../../plugin"

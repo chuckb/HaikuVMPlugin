@@ -7,6 +7,6 @@ buildscript {
 apply plugin: 'com.github.chuckb.haikuvm'
 
 haikuvm {
-  haikuVMConfig = "rpi0"
+  haikuVMConfig = "rpi"
   port = "/dev/tty.SLAB_USBtoUART"
 }

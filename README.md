@@ -21,7 +21,7 @@ card.  TODO: This will be a gradle task.
 ## Usage
 At this time, I have not bundled up the plugin and deployed to the Gradle repo. The plugin is contained as a build source dependency for the samples projects as a proof of concept that this can be made to work.
 1. Clone the project.
-2. Change directory to samples/manualtest.
+2. Change directory to samples/delayblink.
 3. Plug in USB serial adapter to workstation.
 4. `./gradlew deploy`
 5. Connect serial cable pins to Pi.  TODO: Show pic here.

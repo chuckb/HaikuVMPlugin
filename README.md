@@ -13,7 +13,7 @@ Zero using the gradle task deploy.
 1. Java 1.8 or better
 2. Max OS/X (Windows will be tested shortly...maybe)
 3. [ARM cross compiler](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
-4. Pi Zero
+4. [Pi Zero](https://www.adafruit.com/product/2885)
 5. A [serial bootloader](https://github.com/chuckb/raspbootin/tree/master/raspbootin2) and barebones Pi image installed on a micro SD
 card.  TODO: This will be a gradle task.
 6. USB to TTL Serial Cable like [this one from Adafruit](https://www.adafruit.com/product/954)

@@ -76,5 +76,8 @@ public class HaikuVMPlugin implements Plugin<Project> {
     // Add the plugin to build native code for the Rpi
     nativeBuildExtension.setPort(haikuVMExtension.getPortProvider());
     project.getPlugins().apply("com.github.chuckb.buildpi");
+
+    // Add plugin to build Pi image files
+    project.getPlugins().apply("com.github.chuckb.piimage");
   }
 }

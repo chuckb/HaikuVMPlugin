@@ -12,6 +12,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.ExternalDependency;
 import org.gradle.api.plugins.ExtensionContainer;
+import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.Exec;
 import org.gradle.language.base.LanguageSourceSet;
 import org.gradle.language.c.CSourceSet;
@@ -51,6 +52,7 @@ public class BuildNative implements Plugin<Project> {
     final NativeBuildExtension nativeBuildExtension = project.getExtensions().getByType(NativeBuildExtension.class);
 
     project.getConfigurations().create("deployment", deployment -> {
+      // Add the host side serial boot loader sender utility
       ExternalDependency raspbootcom = (ExternalDependency)project.getDependencies().create("com.github.chuckb.raspbootin:raspbootcom");
       raspbootcom.setTargetConfiguration("executable");
       //TODO: Make configurable
@@ -58,6 +60,16 @@ public class BuildNative implements Plugin<Project> {
         v.setBranch("master");
       });
       deployment.getDependencies().add(raspbootcom);
+
+      // Add the Raspberry Pi side serial boot loader kernel
+      ExternalDependency raspbootin2 = (ExternalDependency)project.getDependencies().create("com.github.chuckb.raspbootin:raspbootin2");
+      raspbootin2.setTargetConfiguration("executable");
+      //TODO: Make configurable
+      raspbootin2.version(v -> {
+        v.setBranch("master");
+      });
+      deployment.getDependencies().add(raspbootin2);
+
       nativeBuildExtension.setDeploymentConfiguration(deployment);
     });
   }
@@ -231,7 +243,12 @@ public class BuildNative implements Plugin<Project> {
         t.setDescription("Create local Mac script to launch Rasbootin in a separate process.");
         t.script.set(deployFile);
         t.image.set(imgFile);
-        t.bootLoader.set(nativeBuildExtension.getDeploymentConfiguration().getSingleFile());
+        t.bootLoader.set(nativeBuildExtension.getDeploymentConfiguration().filter(new Spec<File>() {
+          @Override
+          public boolean isSatisfiedBy(File file) {
+            return file.getName().contains("raspbootcom");
+          }
+        }).getSingleFile());
         t.port.set(nativeBuildExtension.getPort());
         t.dependsOn("getRawImage");
       });

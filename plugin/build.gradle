@@ -5,6 +5,14 @@ plugins {
 group = 'com.github.chuckb'
 version = '1.0'
 
+repositories {
+  jcenter()
+}
+
+dependencies {
+  implementation 'de.waldheinz:fat32-lib:0.6.5'
+}
+
 /*
 gradlePlugin {
   plugins {

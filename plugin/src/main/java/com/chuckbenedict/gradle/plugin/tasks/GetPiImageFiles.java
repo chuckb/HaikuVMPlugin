@@ -2,6 +2,7 @@ package com.chuckbenedict.gradle.plugin.tasks;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.inject.Inject;
 
@@ -51,8 +52,11 @@ public class GetPiImageFiles extends DefaultTask {
    */
   void getFiles() throws IOException {
     // TODO: Parameterize branch and destination locations.
-    RpiFirmware.getFile("master", "bootcode.bin", this.getProject().file("build/firmware/pi/files/bootcode.bin"));
-    RpiFirmware.getFile("master", "start.elf", this.getProject().file("build/firmware/pi/files/start.elf"));
+    // FAT lib does not deal with LFNs in a way that is happy for the Pi bootloaders. Use file names
+    // with all caps and the Java FAT lib will not put in LFN directory entries.
+    RpiFirmware.getFile("master", "bootcode.bin", this.getProject().file("build/firmware/pi/files/BOOTCODE.BIN"));
+    RpiFirmware.getFile("master", "start.elf", this.getProject().file("build/firmware/pi/files/START.ELF"));
+    RpiFirmware.getFile("master", "fixup.dat", this.getProject().file("build/firmware/pi/files/FIXUP.DAT"));
     // Copy the Pi cross-compiled serial boot loader kernel image to the firmware files
     // directory so that it can eventually be packaged up into an image file for deployment
     // on to an SD card.
@@ -65,7 +69,24 @@ public class GetPiImageFiles extends DefaultTask {
           }
         }).getSingleFile()
       );
+      // start.elf seems to deal with LFNs ok, so no caps required.
       spec.into(this.getProject().file("build/firmware/pi/files"));
     });
+    writeConfigFile();
+  }
+
+  /**
+   * Write the configuration file for the Pi boot image.
+   * TODO: Make this work for all Pis.
+   */
+  private void writeConfigFile() throws IOException {
+    File file = this.getProject().file("build/firmware/pi/files/config.txt");
+    file.delete();
+    file.createNewFile();
+    PrintWriter writer = new PrintWriter(file);
+    writer.println("start_file=start.elf");
+    writer.println("fixup_file=fixup.dat");
+    writer.println("kernel_address=0x02000000");
+    writer.close();
   }
 }

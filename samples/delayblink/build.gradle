@@ -2,6 +2,9 @@ buildscript {
   dependencies {
     classpath 'com.github.chuckb:haikuvm-plugin:1.0'
   }
+  repositories {
+    jcenter()
+  }
 }
 
 apply plugin: 'com.github.chuckb.haikuvm'

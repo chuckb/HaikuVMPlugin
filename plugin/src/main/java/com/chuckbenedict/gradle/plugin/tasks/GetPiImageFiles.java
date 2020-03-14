@@ -54,9 +54,9 @@ public class GetPiImageFiles extends DefaultTask {
     // TODO: Parameterize branch and destination locations.
     // FAT lib does not deal with LFNs in a way that is happy for the Pi bootloaders. Use file names
     // with all caps and the Java FAT lib will not put in LFN directory entries.
-    RpiFirmware.getFile("master", "bootcode.bin", this.getProject().file("build/firmware/pi/files/BOOTCODE.BIN"));
-    RpiFirmware.getFile("master", "start.elf", this.getProject().file("build/firmware/pi/files/START.ELF"));
-    RpiFirmware.getFile("master", "fixup.dat", this.getProject().file("build/firmware/pi/files/FIXUP.DAT"));
+    RpiFirmware.getFile("master", "bootcode.bin", this.getProject().file("build/firmware/pi/files/bootcode.bin"));
+    RpiFirmware.getFile("master", "start.elf", this.getProject().file("build/firmware/pi/files/start.elf"));
+    RpiFirmware.getFile("master", "fixup.dat", this.getProject().file("build/firmware/pi/files/fixup.dat"));
     // Copy the Pi cross-compiled serial boot loader kernel image to the firmware files
     // directory so that it can eventually be packaged up into an image file for deployment
     // on to an SD card.

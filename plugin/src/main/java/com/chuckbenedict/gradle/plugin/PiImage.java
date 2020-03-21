@@ -11,15 +11,6 @@ import org.gradle.api.Task;
 public class PiImage implements Plugin<Project> {
   @Override
   public void apply(final Project project) {
-    // Add jcenter to the buildscript dependencies
-//    project.getBuildscript().getRepositories().add(
-//      project.getBuildscript().getRepositories().jcenter()
-//    );
-    // Add the FAT32 library dependency
-//    project.getBuildscript().getConfigurations().getByName("classpath", implementation -> {
-//      implementation.getDependencies()
-//        .add(project.getBuildscript().getDependencies().create("de.waldheinz:fat32-lib:0.6.5"));
-//    });
     // Add a task to get the necessary files to build a minimal Pi boot image
     Task getPiImageFiles = project.getTasks().create("getPiImageFiles", GetPiImageFiles.class, new Action<GetPiImageFiles>() {
       public void execute(GetPiImageFiles task) {

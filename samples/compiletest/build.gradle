@@ -2,8 +2,13 @@ buildscript {
   dependencies {
     classpath 'com.github.chuckb:haikuvm-plugin:1.0'
   }
+  // Includebuild feature bringing in the plugin, since I am trying to easily build and test the plugin via this
+  // master project, does not properly shim up repositories of dependencies (a fat32 lib in this case, which
+  // has been customized and is now a jitpack lib via my github repo). So this repo definition is necessary
+  // for projects testing the plugin within this master project but should not be necessary for external consuming
+  // projects.
   repositories {
-    jcenter()
+    maven { url 'https://jitpack.io' }
   }
 }
 

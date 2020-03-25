@@ -25,6 +25,6 @@ The [delayblink](samples/delayblink) Java project will blink the green ACT LED o
 5. Transfer the built pi boot image file to an empty micro SD card. Use `sudo dd if=boot.img of=/dev/diskx bs=512`. Use `sudo diskutil list` to find your SD card. Use `sudo diskutil unmountDisk /dev/diskx` to make the card available for dd writing.
 6. Plug card into Pi. Plug in USB serial adapter to workstation.
 7. Change directory back to samples/delayblink.
-8. `./gradlew deploy`
-9. Connect serial cable pins to Pi.  TODO: Show pic here.
-10. Marvel at the blinking active LED on the Pi Zero board using [bare metal Java code](samples/delayblink/source/main/java/Main.java).
+8. `./gradlew deploy` A console window should launch with host bootloader ready to transfer kernel to Rpi.
+9. Connect ![serial cable](resources/images/RPiSerial.jpg) pins to Pi.
+10. Marvel at the blinking active LED on the Pi Zero board using [bare metal Java code](samples/delayblink/src/main/java/Main.java).

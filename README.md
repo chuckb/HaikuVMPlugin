@@ -27,5 +27,5 @@ The [delayblink](samples/delayblink) Java project will blink the green ACT LED o
 7. Change directory back to samples/delayblink.
 8. `./gradlew deploy` A console window should launch with host bootloader ready to transfer kernel to Rpi.
 9. Connect serial cable pins to Pi.
-<img src="https://github.com/chuckb/HaikuVMPlugin/resources/images/RPiSerial.jpg" alt="RPi Serial Connection" width="250"/>
+<img src="https://github.com/chuckb/HaikuVMPlugin/blob/master/resources/images/RPiSerial.jpg" alt="RPi Serial Connection" width="250"/>
 10. Marvel at the blinking active LED on the Pi Zero board using [bare metal Java code](samples/delayblink/src/main/java/Main.java).

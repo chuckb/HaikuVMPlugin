@@ -35,7 +35,7 @@ This plugin is my own original work. My contribution was to add the missing bare
 The plugin makes use of several projects and many educational sources:
 - [HaikuVM](http://haiku-vm.sourceforge.net/)
   - HaikuVM brought Java to Arduino platforms by taking compiled Java bytecode, the Arduino bootstrap, and the jeJos VM and combining them into a native C application that can be cross-compiled to a target.
-  - HaikuVM is based on work from [leJos](http://www.lejos.org/links.php). leJos is published under the Mozilla Public License 1.0. leJos was developed for the Lego Mindstorms &trade;.
+  - HaikuVM is based on work from [leJos](http://www.lejos.org). leJos is published under the Mozilla Public License 1.0. leJos was developed for the Lego Mindstorms &trade;.
   - I forked HaikuVM version 1.4.3 and published it [here](https://github.com/chuckb/haikuVM), adding Raspberry Pi bootstrapping and the beginnings of BCM Java wrapper classes.
 - The ARM® Architecture Reference Manual, obtainable free with registered account from https://developer.arm.com
 - The [ARM1176JZF-S Technical Reference Manual](http://infocenter.arm.com/help/topic/com.arm.doc.ddi0301h/DDI0301H_arm1176jzfs_r0p7_trm.pdf)

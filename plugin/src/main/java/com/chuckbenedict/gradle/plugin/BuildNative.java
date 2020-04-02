@@ -14,6 +14,7 @@ import org.gradle.api.artifacts.ExternalDependency;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.Exec;
+import org.gradle.internal.os.OperatingSystem;
 import org.gradle.language.base.LanguageSourceSet;
 import org.gradle.language.c.CSourceSet;
 import org.gradle.language.c.plugins.CPlugin;
@@ -34,6 +35,8 @@ import org.gradle.nativeplatform.toolchain.NativeToolChainRegistry;
 import org.gradle.platform.base.ComponentSpecContainer;
 import org.gradle.platform.base.Platform;
 import org.gradle.platform.base.PlatformContainer;
+
+import groovy.lang.Closure;
 
 /**
  * Configure the c and cpp plugins to build the native application.
@@ -231,6 +234,15 @@ public class BuildNative implements Plugin<Project> {
     }
 
     @Mutate
+    /**
+     * Create a local shell script to launch the deploy task. This works
+     * for works for Windows, Mac, and Linux, because Windows will use WSL.
+     * Mac will launch the task with an open call. Linux/Windows will open
+     * with bash.
+     * @param tasks
+     * @param spec
+     * @param extensionContainer
+     */
     void createShellDeployScriptTask(ModelMap<Task> tasks, 
         @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec,
         final ExtensionContainer extensionContainer) {
@@ -238,9 +250,8 @@ public class BuildNative implements Plugin<Project> {
       File elfFile = spec.getExecutable().getFile();
       File imgFile = getImageFile(elfFile);
       File deployFile = getDeployScriptFile(elfFile);
-      // TODO: Make OS aware
       tasks.create("createShellDeployScript", ShellDeployScript.class, t -> {
-        t.setDescription("Create local Mac script to launch Rasbootin in a separate process.");
+        t.setDescription("Create local script to launch Rasbootin in a separate process.");
         t.script.set(deployFile);
         t.image.set(imgFile);
         t.bootLoader.set(nativeBuildExtension.getDeploymentConfiguration().filter(new Spec<File>() {
@@ -255,17 +266,52 @@ public class BuildNative implements Plugin<Project> {
     }
 
     @Mutate
-    public void createRasbootinDeployTask(ModelMap<Task> tasks, 
+    public void createRasbootinDeployTaskForMac(ModelMap<Task> tasks, 
         @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec,
         final ExtensionContainer extensionContainer) {
       File elfFile = spec.getExecutable().getFile();
       File deployFile = getDeployScriptFile(elfFile);
-      tasks.create("deploy", Exec.class, t -> {
-        t.setDescription("Run raspberry pi com port boot loader to load raw image.");
+      tasks.create("deployForMac", Exec.class, t -> {
+        t.setDescription("Run raspberry pi com port boot loader to load raw image from Mac host.");
         t.dependsOn("createShellDeployScript");
         t.dependsOn(extensionContainer.getByType(NativeBuildExtension.class).getDeploymentConfiguration());
-        //TODO: Make OS independent
+        t.onlyIf(new Closure<Boolean>(null) {
+          @Override
+          public Boolean call(Object owner) {
+            return OperatingSystem.current().isMacOsX();
+          }
+        });
         t.commandLine("open", "-a", "Terminal", deployFile.getAbsolutePath());
+      });
+    }
+
+    @Mutate
+    public void createRasbootinDeployTaskForLinuxAndWSL1(ModelMap<Task> tasks, 
+        @Path("components.main.binaries.executable") NativeExecutableBinarySpec spec,
+        final ExtensionContainer extensionContainer) {
+      File elfFile = spec.getExecutable().getFile();
+      File deployFile = getDeployScriptFile(elfFile);
+      tasks.create("deployForLinuxOrWSL1", Exec.class, t -> {
+        t.setDescription("Run raspberry pi com port boot loader to load raw image from Linux or WSL1 hosts.");
+        t.dependsOn("createShellDeployScript");
+        t.dependsOn(extensionContainer.getByType(NativeBuildExtension.class).getDeploymentConfiguration());
+        t.onlyIf(new Closure<Boolean>(null) {
+          @Override
+          public Boolean call(Object owner) {
+            // Windows Sybsystem for Linux Version 1 (WSL1) will report Linux here
+            return OperatingSystem.current().isLinux();
+          }
+        });
+        t.commandLine("bash", "-c", deployFile.getAbsolutePath());
+      });
+    }
+    
+    @Mutate
+    public void createRasbootinDeployTask(ModelMap<Task> tasks) {
+      tasks.create("deploy", Task.class, t -> {
+        t.setDescription("Run raspberry pi com port bootloader to load raw image");
+        t.dependsOn("deployForMac");
+        t.dependsOn("deployForLinuxOrWSL1");
       });
     }
 

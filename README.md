@@ -7,7 +7,7 @@ This project is in active development and more hosts, boards, and documentation 
 
 ## Prerequisites
 1. [Java](https://www.oracle.com/java/technologies/) 1.8 or better
-2. Max OS/X (Windows will be tested...it's on the list)
+2. Max OS/X or Windows 10 with WSL
 3. [ARM cross compiler](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
 4. [Pi Zero](https://www.adafruit.com/product/2885)
 5. USB to TTL Serial Cable like [this one from Adafruit](https://www.adafruit.com/product/954)
@@ -27,7 +27,7 @@ The [delayblink](samples/delayblink) Java project will blink the green ACT LED o
 <img src="https://github.com/chuckb/HaikuVMPlugin/blob/master/resources/images/RPiSerial.jpg" alt="RPi Serial Connection" width="250">
 
 ## Build A Standalone Project Using The Plugin
-See [Embedded Java Hello World On Raspberry Pi Zero](https://blog.chuckstechtalk.com/software/2020/03/28/embedded-java-hello-world-on-raspberry-pi-zero.html)
+See [Embedded Java Hello World On Raspberry Pi Zero](https://blog.chuckstechtalk.com/software/2020/03/28/embedded-java-hello-world-on-raspberry-pi-zero.html). For Windows setup considerations, see [Embedded Java For Raspberry Pi Zero Setup On Windows 10 Hosts](https://blog.chuckstechtalk.com/software/2020/04/02/embedded-java-raspberry-pi-windows.html)
 
 ## Attribution
 This plugin is my own original work. My contribution was to add the missing bare-metal bootstrapping for boards like the Raspberry Pi and bundling/streamlining of the build/deploy operations into something familiar to Java developers, like Gradle tasks.
